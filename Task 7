@@ -1,0 +1,62 @@
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // created an unsorted of ints
+        List<Integer> list = Arrays.asList(21, 11, 2, 2000, 7, 9);
+
+        // prints the unsorted list
+        System.out.println("Unsorted list: " + list);
+
+        // sorts the list using heap sort
+        heapSort(list);
+
+        // prints out the sorted list
+        System.out.println("Sorted list: " + list);
+    }
+
+    // implementation of heap sort algorithm using min heap
+    public static void heapSort(List<Integer> list) {
+        // create a new list to allow modifications
+        List<Integer> heap = new ArrayList<>(list);
+
+        // build min heap from the unsorted list
+        buildMinHeap(heap);
+
+        // extract the minimum element and place it at the beginning of the list
+        for (int i = 0; i < list.size(); i++) {
+            list.set(i, heap.get(0));
+            heap.set(0, heap.get(heap.size() - 1));
+            heap.remove(heap.size() - 1);
+            minHeapify(heap, 0);
+        }
+    }
+
+    // builds a minheap from the unsorted list
+    public static void buildMinHeap(List<Integer> heap) {
+        for (int i = heap.size() / 2 - 1; i >= 0; i--) {
+            minHeapify(heap, i);
+        }
+    }
+
+    // heapify a subtree with root i, assuming that the left and right subtrees are already min heaps
+    public static void minHeapify(List<Integer> heap, int i) {
+        int left = 2 * i + 1;
+        int right = 2 * i + 2;
+        int smallest = i;
+
+        if (left < heap.size() && heap.get(left) < heap.get(smallest)) {
+            smallest = left;
+        }
+
+        if (right < heap.size() && heap.get(right) < heap.get(smallest)) {
+            smallest = right;
+        }
+
+        if (smallest != i) {
+            Collections.swap(heap, i, smallest);
+            minHeapify(heap, smallest);
+        }
+    }
+}

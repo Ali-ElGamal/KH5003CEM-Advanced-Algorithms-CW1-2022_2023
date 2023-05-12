@@ -1,0 +1,108 @@
+import java.util.*;
+
+public class Main
+{
+
+    private static class _Node {
+        String value;
+        _Node left, right;
+        boolean isVariable = false;
+        int variableValue = 0;
+
+        _Node(String value) {
+            this.value = value;
+        }
+    }
+
+    private static int variableCounter = 0;
+
+    private static _Node buildExpressionTree(String[] tokens) {
+        Stack<_Node> stack = new Stack<>();
+        for (String token : tokens) {
+            _Node node = new _Node(token);
+            if (isOperator(token)) {
+                node.right = stack.pop();
+                node.left = stack.pop();
+            } else if (isVar(token)) {
+                node.isVariable = true;
+                node.variableValue = ++variableCounter;
+            }
+            stack.push(node);
+        }
+        return stack.pop();
+    }
+
+    private static boolean isOperator(String token) {
+        return token.equals("+") || token.equals("-") || token.equals("*") || token.equals("/");
+    }
+
+    private static boolean isVar(String token) {
+        return token.startsWith("x");
+    }
+
+    private static int eval(_Node root) {
+        if (root == null) {
+            return 0;
+        }
+        if (root.isVariable) {
+            return root.variableValue;
+        }
+        int leftValue = eval(root.left);
+        int rightValue = eval(root.right);
+        switch (root.value) {
+            case "+":
+                return leftValue + rightValue;
+            case "-":
+                return leftValue - rightValue;
+            case "*":
+                return leftValue * rightValue;
+            case "/":
+                return leftValue / rightValue;
+            default:
+                return Integer.parseInt(root.value);
+        }
+    }
+
+    private static void updateVar(_Node root) {
+        if (root == null) {
+            return;
+        }
+        if (root.isVariable) {
+            Scanner scanner = new Scanner(System.in);
+            System.out.print("Enter value for " + root.value + ": ");
+            root.variableValue = scanner.nextInt();
+        }
+        updateVar(root.left);
+        updateVar(root.right);
+    }
+
+    private static void prtExpressionTree(_Node root, int depth) {
+        if (root == null) {
+            return;
+        }
+        prtExpressionTree(root.right, depth + 1);
+        for (int i = 0; i < depth; i++) {
+            System.out.print("    ");
+        }
+        if (root.isVariable) {
+            System.out.println(root.value + ": " + root.variableValue);
+        } else {
+            System.out.println(root.value);
+        }
+        prtExpressionTree(root.left, depth + 1);
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter an arithmetic expression in fully parenthesized notation: ");
+        String expression = scanner.nextLine();
+        String[] tokens = expression.split("\\s+");
+        _Node root = buildExpressionTree(tokens);
+        prtExpressionTree(root, 0);
+        int result = eval(root);
+        System.out.println(expression + " = " + result);
+        updateVar(root);
+        result = eval(root);
+        System.out.println(expression + " = " + result);
+    }
+}

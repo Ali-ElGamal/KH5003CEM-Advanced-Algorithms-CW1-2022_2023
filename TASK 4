@@ -1,0 +1,73 @@
+import java.util.PriorityQueue;
+
+public class Main {
+
+    // Class to represent a CPU job
+    private static class Job implements Comparable<Job> {
+        int id; // Job id
+        int priority; // Job priority
+        int duration; // Job duration
+
+        public Job(int id, int priority, int duration) {
+            this.id = id;
+            this.priority = priority;
+            this.duration = duration;
+        }
+
+        // Implementing the compareTo method to define job priority for the priority queue
+        @Override
+        public int compareTo(Job other) {
+            // First Come First Served
+            if (this.id != other.id) {
+                return Integer.compare(this.id, other.id);
+            }
+
+            // Highest priority
+            if (this.priority != other.priority) {
+                return Integer.compare(other.priority, this.priority);
+            }
+
+            // Shortest Remaining Time First
+            return Integer.compare(this.duration, other.duration);
+        }
+
+        // Method to check if the job is completed
+        public boolean isCompleted() {
+            return duration == 0;
+        }
+
+        // Method to execute the job for one time slice
+        public void execute() {
+            duration--;
+        }
+
+        // Method to get the job information
+        public String getInfo() {
+            return "job " + id + " (priority " + priority + ", duration " + duration + ")";
+        }
+    }
+
+    public static void main(String[] args) {
+        PriorityQueue<Job> queue = new PriorityQueue<>();
+
+        // Adding jobs to the queue
+        queue.offer(new Job(1, 10, 10));
+        queue.offer(new Job(2, 5, 5));
+
+        int time = 0;
+        while (!queue.isEmpty()) {
+            // Selecting the job to execute based on the priority queue ordering
+            Job job = queue.poll();
+            System.out.println("System time [" + time + "] - " + job.getInfo() + " is running.");
+
+            // Executing the job for one time slice
+            job.execute();
+            time++;
+
+            // Checking if the job is completed, if not, add it back to the queue
+            if (!job.isCompleted()) {
+                queue.offer(job);
+            }
+        }
+    }
+}

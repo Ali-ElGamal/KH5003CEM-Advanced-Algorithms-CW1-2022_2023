@@ -1,0 +1,111 @@
+// Import necessary libraries
+import java.util.*;
+
+// Define a class called "Main"
+public class Main {
+
+    // Create a map to store the graph connectivity information
+    static Map<String, List<String>> graph = new HashMap<>();
+
+    // Define the main function
+    public static void main(String[] args) {
+
+        // Define the node connectivity information
+        String[] edges = {"AB", "AC", "AD", "BE", "CA", "CB", "DE", "EA", "EB", "GC", "GE"};
+
+        // Build the graph
+        for (String edge : edges) {
+            String from = edge.substring(0, 1);
+            String to = edge.substring(1, 2);
+            if (!graph.containsKey(from)) {
+                graph.put(from, new ArrayList<>());
+            }
+            graph.get(from).add(to);
+            if (!graph.containsKey(to)) {
+                graph.put(to, new ArrayList<>());
+            }
+            graph.get(to).add(from);
+        }
+
+        // Compute the routing tables
+        for (String node : graph.keySet()) {
+            System.out.println("Routing table for node " + node + ":");
+            for (String dest : graph.keySet()) {
+                if (!dest.equals(node)) {
+                    List<String> path = computeShortestPath(node, dest);
+                    System.out.println(dest + ": " + path);
+                }
+            }
+            System.out.println();
+        }
+    }
+
+    // Define a function to compute the shortest path using Dijkstra's algorithm
+    private static List<String> computeShortestPath(String start, String end) {
+
+        // Create necessary data structures
+        Map<String, String> previous = new HashMap<>();
+        Map<String, Integer> distances = new HashMap<>();
+        PriorityQueue<String> nodes = new PriorityQueue<>(Comparator.comparingInt(distances::get));
+        Set<String> visited = new HashSet<>();
+
+        // Initialize distances to infinity except for start node
+        for (String node : graph.keySet()) {
+            distances.put(node, Integer.MAX_VALUE);
+        }
+        distances.put(start, 0);
+
+        // Add start node to priority queue
+        nodes.add(start);
+
+        // While there are still nodes in the queue
+        while (!nodes.isEmpty()) {
+
+            // Get the node with the minimum distance
+            String current = nodes.poll();
+
+            // If the current node is the end node, return the path
+            if (current.equals(end)) {
+
+                // Build path from start to end by following previous pointers
+                List<String> path = new ArrayList<>();
+                String node = end;
+                while (node != null) {
+                    path.add(node);
+                    node = previous.get(node);
+                }
+                Collections.reverse(path);
+                return path;
+            }
+
+            // Add the current node to the visited set
+            visited.add(current);
+
+            // For each neighboring node
+            for (String neighbor : graph.get(current)) {
+
+                // If the neighbor has not been visited
+                if (!visited.contains(neighbor)) {
+
+                    // Calculate the tentative distance to the neighbor
+                    int distance = distances.get(current) + 1;
+
+                    // If the tentative distance is less than the current distance
+                    if (distance < distances.get(neighbor)) {
+
+                        // Update the neighbor's distance and previous node
+                        distances.put(neighbor, distance);
+                        previous.put(neighbor, current);
+
+                        // Remove and re-add the neighbor to the priority queue to update priority
+                        nodes.remove(neighbor);
+                        nodes.add(neighbor);
+                    }
+                }
+            }
+        }
+
+        // If we get here, no path was found
+        return new ArrayList<>();
+    }
+}

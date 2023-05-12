@@ -1,0 +1,113 @@
+import java.util.NoSuchElementException;
+
+public class Main {
+    // Create a generic class TwoColorDoubleStack
+    public class TwoColorDoubleStack<T> {
+        private int capacity;  // Maximum size of the stack
+        private T[] data;  // Array to store the stack elements
+        private int redTop;  // Index of the top element of the red stack
+        private int blueTop;  // Index of the top element of the blue stack
+
+        // Constructor that initializes the stack with the given capacity
+        public TwoColorDoubleStack(int capacity) {
+            this.capacity = capacity;
+            this.data = (T[]) new Object[capacity];
+            this.redTop = -1;  // Red stack is initially empty
+            this.blueTop = capacity;  // Blue stack is initially empty
+        }
+
+        // Method to push an element onto the red stack
+        public void redPush(T item) {
+            // Check if the stack is full
+            if (redTop + 1 == blueTop) {
+                throw new IllegalStateException("Stack overflow");
+            }
+            // Increment the red top index and add the item to the stack
+            data[++redTop] = item;
+        }
+
+        // Method to pop an element from the red stack
+        public T redPop() {
+            // Check if the red stack is empty
+            if (redTop == -1) {
+                throw new NoSuchElementException("Red stack is empty");
+            }
+            // Remove the top element of the red stack and decrement the red top index
+            return data[redTop--];
+        }
+
+        // Method to push an element onto the blue stack
+        public void bluePush(T item) {
+            // Check if the stack is full
+            if (redTop + 1 == blueTop) {
+                throw new IllegalStateException("Stack overflow");
+            }
+            // Decrement the blue top index and add the item to the stack
+            data[--blueTop] = item;
+        }
+
+        // Method to pop an element from the blue stack
+        public T bluePop() {
+            // Check if the blue stack is empty
+            if (blueTop == capacity) {
+                throw new NoSuchElementException("Blue stack is empty");
+            }
+            // Remove the top element of the blue stack and increment the blue top index
+            return data[blueTop++];
+        }
+
+        // Method to check if the red stack is empty
+        public boolean isRedEmpty() {
+            return redTop == -1;
+        }
+
+        // Method to check if the blue stack is empty
+        public boolean isBlueEmpty() {
+            return blueTop == capacity;
+        }
+
+        // Method to check if the stack is full
+        public boolean isFull() {
+            return redTop + 2 == blueTop;
+        }
+
+        // Method to get the size of the red stack
+        public int redSize() {
+            return redTop + 1;
+        }
+
+        // Method to get the size of the blue stack
+        public int blueSize() {
+            return capacity - blueTop;
+        }
+    }
+
+    // Main method to test the TwoColorDoubleStack class
+    public static void main(String[] args) {
+        Main main = new Main();
+        TwoColorDoubleStack<Integer> stack = main.new TwoColorDoubleStack<>(10);
+
+        // Push elements onto the red stack
+        stack.redPush(1);
+        stack.redPush(2);
+        stack.redPush(3);
+
+        // Push elements onto the blue stack
+        stack.bluePush(4);
+        stack.bluePush(5);
+
+        System.out.println(stack.redPop());
+        System.out.println(stack.bluePop());
+
+        System.out.println(stack.redSize());
+        System.out.println(stack.blueSize());
+        stack.redPush(6);
+        stack.bluePush(7);
+
+        System.out.println(stack.redPop());
+        System.out.println(stack.bluePop());
+
+        System.out.println(stack.redSize());
+        System.out.println(stack.blueSize());
+    }
+}

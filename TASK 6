@@ -1,0 +1,102 @@
+import java.util.*;
+
+public class Main {
+
+    private Set<String> lexicon;
+
+    public Main(Set<String> lexicon) {
+        this.lexicon = lexicon;
+    }
+
+    public List<String> wchecker(String s) {
+        if (lexicon.contains(s)) {
+            return Collections.singletonList(s);
+        }
+
+        List<String> Words = new ArrayList<>();
+
+        // checking for replacement
+        for (int i = 0; i < s.length(); i++) {
+            for (char c = 'a'; c <= 'z'; c++) {
+                String word = replace(s, i, c);
+                if (lexicon.contains(word)) {
+                    Words.add(word);
+                }
+            }
+        }
+
+        // checking for deletion
+        for (int i = 0; i < s.length(); i++) {
+            String word = deleteChar(s, i);
+            if (lexicon.contains(word)) {
+                Words.add(word);
+            }
+        }
+
+        // check for insertion
+        for (int i = 0; i <= s.length(); i++) {
+            for (char c = 'a'; c <= 'z'; c++) {
+                String word = insert(s, i, c);
+                if (lexicon.contains(word)) {
+                    Words.add(word);
+                }
+            }
+        }
+
+        // check for swapping
+        for (int i = 0; i < s.length() - 1; i++) {
+            String word = swap(s, i, i + 1);
+            if (lexicon.contains(word)) {
+                Words.add(word);
+            }
+        }
+
+        return Words;
+    }
+
+    private String replace(String s, int index, char c) {
+        StringBuilder buildstring = new StringBuilder(s);
+        buildstring.setCharAt(index, c);
+        return buildstring.toString();
+    }
+
+    private String deleteChar(String s, int index) {
+        StringBuilder buildstring = new StringBuilder(s);
+        buildstring.deleteCharAt(index);
+        return buildstring.toString();
+    }
+
+    private String insert(String s, int index, char c) {
+        StringBuilder buildstring = new StringBuilder(s);
+        buildstring.insert(index, c);
+        return buildstring.toString();
+    }
+
+    private String swap(String s, int i, int j) {
+        StringBuilder buildstring = new StringBuilder(s);
+        char temp = buildstring.charAt(i);
+        buildstring.setCharAt(i, buildstring.charAt(j));
+        buildstring.setCharAt(j, temp);
+        return buildstring.toString();
+    }
+
+    public static void main(String[] args) {
+        Set<String> lexicon = new HashSet<>();
+        lexicon.add("advanced");
+        lexicon.add("algorithms");
+        lexicon.add("ali");
+        lexicon.add("elgamal");
+
+        Main wordchecker = new Main(lexicon);
+
+        String input1 = "ail";
+        String input2 = "elgamel";
+        String input3 = "advancd";
+        String input4 = "algorthms";
+
+        System.out.println(wordchecker.wchecker(input1)); // should print [ali]
+        System.out.println(wordchecker.wchecker(input2)); // should print [elgamal]
+        System.out.println(wordchecker.wchecker(input3)); 
+        System.out.println(wordchecker.wchecker(input4));
+    }
+}
